@@ -1,0 +1,4 @@
+rootProject.name = 'async-sync-analysis'
+include ":commons-domain"
+include ":sync-app"
+include ":async-app"
