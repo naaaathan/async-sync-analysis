@@ -1,5 +1,6 @@
 package com.ufu.tcc.commonsdomain.model;
 
+import com.ufu.tcc.commonsdomain.enums.Occupation;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,11 +22,11 @@ public class RoomOccupation {
     @JoinColumn(name = "hotel_room_id")
     private HotelRoom hotelRoomId;
 
-    @Column(name = "room_occupation_begin")
-    private Date roomOccupationBegin;
+    @Column(name = "room_occupation_date")
+    private Date roomOccupationDate;
 
-    @Column(name = "room_occupation_end")
-    private Date roomOccupationEnd;
+    @Column(name = "occupation")
+    private Occupation occupation;
 
     public Long getId() {
         return id;
@@ -43,19 +44,19 @@ public class RoomOccupation {
         this.hotelRoomId = hotel_room_id;
     }
 
-    public Date getRoomOccupationBegin() {
-        return roomOccupationBegin;
+    public Date getRoomOccupationDate() {
+        return roomOccupationDate;
     }
 
-    public void setRoomOccupationBegin(Date room_occupation_begin) {
-        this.roomOccupationBegin = room_occupation_begin;
+    public void setRoomOccupationDate(Date room_occupation_begin) {
+        this.roomOccupationDate = room_occupation_begin;
     }
 
-    public Date getRoomOccupationEnd() {
-        return roomOccupationEnd;
+    public Occupation getOccupation() {
+        return occupation;
     }
 
-    public void setRoomOccupationEnd(Date room_occupation_end) {
-        this.roomOccupationEnd = room_occupation_end;
+    public void setOccupation(Occupation occupation) {
+        this.occupation = occupation;
     }
 }
