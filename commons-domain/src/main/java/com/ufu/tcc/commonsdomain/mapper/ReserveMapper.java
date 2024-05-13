@@ -12,13 +12,14 @@ public class ReserveMapper {
     private final CustomerMapper customerMapper;
 
     @Autowired
-    public ReserveMapper(HotelRoomMapper hotelRoomMapper) {
+    public ReserveMapper(HotelRoomMapper hotelRoomMapper, CustomerMapper customerMapper) {
         this.hotelRoomMapper = hotelRoomMapper;
+        this.customerMapper = customerMapper;
     }
 
     public ReserveRecord toRecord(Reserve reserve) {
         return new ReserveRecord(
-                reserve.getCustomer(),
+                customerMapper.toRecord(reserve.getCustomer()),
                 reserve.getReserveBegin(),
                 reserve.getReserveEnd(),
                 hotelRoomMapper.toRecord(reserve.getHotelRoomId()),
@@ -28,6 +29,7 @@ public class ReserveMapper {
 
     public Reserve toModel(ReserveRecord reserveRecord) {
         Reserve reserve = new Reserve();
+        reserve.setCustomer(customerMapper.toModel(reserveRecord.customerRecord()));
         reserve.setReserveBegin(reserveRecord.reserveBegin());
         reserve.setReserveEnd(reserveRecord.reserveEnd());
         reserve.setHotelRoomId(hotelRoomMapper.toModel(reserveRecord.hotelRoom()));

@@ -29,6 +29,11 @@ flyway {
     locations = ['classpath:db/migration']
 }
 
-task prepareKotlinBuildScriptModel {
 
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
 }

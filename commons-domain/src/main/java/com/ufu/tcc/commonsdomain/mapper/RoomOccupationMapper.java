@@ -16,13 +16,15 @@ public class RoomOccupationMapper {
     }
 
     public RoomOccupationRecord toRecord(RoomOccupation roomOccupation) {
-        return new RoomOccupationRecord(hotelRoomMapper.toRecord(roomOccupation.getHotelRoomId()), roomOccupation.getRoomOccupationDate(), roomOccupation.getOccupation());
+        return new RoomOccupationRecord(hotelRoomMapper.toRecord(roomOccupation.getHotelRoom()), roomOccupation.getRoomOccupationDateBegin(), roomOccupation.getRoomOccupationDateEnd(), roomOccupation.getOccupation());
     }
 
     public RoomOccupation toModel(RoomOccupationRecord roomOccupationRecord) {
         RoomOccupation roomOccupation = new RoomOccupation();
-        roomOccupation.setHotelRoomId(hotelRoomMapper.toModel(roomOccupationRecord.hotelRoom()));
-        roomOccupation.setRoomOccupationDate(roomOccupationRecord.roomOccupationDate());
+        roomOccupation.setHotelRoom(hotelRoomMapper.toModel(roomOccupationRecord.hotelRoom()));
+        roomOccupation.setRoomOccupationDateBegin(roomOccupationRecord.roomOccupationBeginDate());
+        roomOccupation.setRoomOccupationDateEnd(roomOccupationRecord.roomOccupationEndDate());
+        roomOccupation.setOccupation(roomOccupationRecord.occupation());
         return roomOccupation;
     }
 }

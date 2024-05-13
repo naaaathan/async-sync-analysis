@@ -5,4 +5,4 @@ import com.ufu.tcc.commonsdomain.model.HotelRoom;
 
 import java.util.Date;
 
-public record RoomOccupationRecord(HotelRoomRecord hotelRoom, Date roomOccupationDate, Occupation occupation) { }
+public record RoomOccupationRecord(HotelRoomRecord hotelRoom, Date roomOccupationBeginDate, Date roomOccupationEndDate, Occupation occupation) { }

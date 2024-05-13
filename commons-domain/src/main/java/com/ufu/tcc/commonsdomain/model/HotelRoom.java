@@ -6,12 +6,14 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
-@Entity(name = "hotel_room")
+@Entity
+@Table(name = "hotel_room", schema = "hotel_tcc")
 public class HotelRoom {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hotel_tcc.hotel_room_seq")
     private Long id;
 
     @ManyToOne

@@ -1,6 +1,11 @@
 CREATE SCHEMA IF NOT EXISTS HOTEL_TCC;
 SET search_path TO HOTEL_TCC;
 
+CREATE SEQUENCE if not exists reserve_seq START 1;
+CREATE SEQUENCE if not exists room_occupation_seq START 1;
+CREATE SEQUENCE if not exists hotel_room_seq START 1;
+CREATE SEQUENCE if not exists customer_seq START 1;
+
 CREATE TABLE IF NOT EXISTS HOTEL_TCC.hotel (
     id BIGINT NOT NULL,
     hotel_name VARCHAR(255) NOT NULL,
@@ -30,7 +35,8 @@ CREATE TABLE IF NOT EXISTS HOTEL_TCC.room_occupation(
     id BIGINT NOT NULL,
     hotel_room_id BIGINT NOT NULL,
     room_occupation_begin DATE NOT NULL,
-    occupied VARCHAR(50) NOT NULL,
+    room_occupation_end DATE NOT NULL,
+    occupation VARCHAR(50) NOT NULL,
     constraint pk_room_occupation primary key (id),
     constraint fk_room_occupation_hotel_room foreign key (hotel_room_id) references hotel_room(id)
 );

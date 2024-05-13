@@ -3,16 +3,13 @@ package com.ufu.tcc.syncapp.service;
 import com.ufu.tcc.commonsdomain.enums.Occupation;
 import com.ufu.tcc.commonsdomain.enums.ReserveStatus;
 import com.ufu.tcc.commonsdomain.mapper.ReserveMapper;
-import com.ufu.tcc.commonsdomain.mapper.RoomOccupationMapper;
 import com.ufu.tcc.commonsdomain.model.RoomOccupation;
 import com.ufu.tcc.commonsdomain.records.CustomerRecord;
 import com.ufu.tcc.commonsdomain.records.HotelRoomRecord;
-import com.ufu.tcc.commonsdomain.records.PaymentMethodRecord;
+import com.ufu.tcc.commonsdomain.records.PaymentMethod;
 import com.ufu.tcc.commonsdomain.records.ReserveDataRecord;
 import com.ufu.tcc.commonsdomain.records.ReserveRecord;
-import com.ufu.tcc.commonsdomain.records.RoomOccupationRecord;
 import com.ufu.tcc.commonsdomain.repository.ReserveRepository;
-import com.ufu.tcc.commonsdomain.repository.RoomOccupationRepository;
 import com.ufu.tcc.commonsdomain.service.CustomerService;
 import com.ufu.tcc.commonsdomain.service.HotelRoomService;
 import com.ufu.tcc.commonsdomain.service.ReserveService;
@@ -53,8 +50,7 @@ public class SyncReserveService implements ReserveService {
     }
 
     @Override
-    @Transactional
-    public void reserveHotelRoom(Long customerId, ReserveDataRecord reserveDataRecord, PaymentMethodRecord paymentMethod) {
+    public void reserveHotelRoom(Long customerId, ReserveDataRecord reserveDataRecord, PaymentMethod paymentMethod) {
 
         List<RoomOccupation> roomOccupations = roomOccupationService.findRoomOccupationByHotelRoomIdAndDates(
                 reserveDataRecord.hotelRoomId(),
@@ -63,22 +59,32 @@ public class SyncReserveService implements ReserveService {
         );
 
         // Customers may see the same date available, but only one can reserve it then we use PESSIMISTIC_READ
-        entityManager.lock(roomOccupations, LockModeType.PESSIMISTIC_READ);
+        lockRoomsThatWillPossiblyBeOccupied(roomOccupations);
 
-        HotelRoomRecord hotelRoomRecord = hotelRoomService.findHotelRoomById(reserveDataRecord.hotelRoomId());
+        HotelRoomRecord hotelRoomRecord = hotelRoomService.findHotelRecordRoomById(reserveDataRecord.hotelRoomId());
         CustomerRecord customerRecord = customerService.findCustomerById(customerId);
 
         roomOccupations.stream().filter(
                 roomOccupation -> Occupation.OCCUPIED.equals(roomOccupation.getOccupation())
         ).findAny().ifPresent(
                 roomOccupation -> {
-                    throw new RuntimeException(String.format("Room is already occupied in the date %s", roomOccupation.getRoomOccupationDate()));
+                    throw new RuntimeException(String.format("Room is already occupied in the date %s", roomOccupation.getRoomOccupationDateBegin()));
                 }
         );
 
         this.save(customerRecord, reserveDataRecord, hotelRoomRecord);
 
-        roomOccupationService.save(hotelRoomRecord, reserveDataRecord);
+        if(roomOccupations.isEmpty()) {
+            roomOccupationService.save(hotelRoomRecord, reserveDataRecord);
+        }else {
+            roomOccupationService.update(roomOccupations, Occupation.OCCUPIED);
+        }
+    }
+
+    private void lockRoomsThatWillPossiblyBeOccupied(List<RoomOccupation> roomOccupations) {
+        roomOccupations.forEach(
+                roomOccupation -> entityManager.lock(roomOccupation, LockModeType.PESSIMISTIC_READ)
+        );
     }
 
     @Override
@@ -86,7 +92,7 @@ public class SyncReserveService implements ReserveService {
         return null;
     }
 
-    public void save(CustomerRecord customerRecord,ReserveDataRecord reserveDataRecord, HotelRoomRecord hotelRoomRecord){
+    public void save(CustomerRecord customerRecord, ReserveDataRecord reserveDataRecord, HotelRoomRecord hotelRoomRecord) {
         ReserveRecord reserveRecord = new ReserveRecord(customerRecord, reserveDataRecord.reserveBegin(), reserveDataRecord.reserveEnd(), hotelRoomRecord, ReserveStatus.PENDING);
         this.reserveRepository.save(reserveMapper.toModel(reserveRecord));
     }

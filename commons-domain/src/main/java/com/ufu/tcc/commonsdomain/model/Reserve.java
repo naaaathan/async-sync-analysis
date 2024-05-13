@@ -1,6 +1,8 @@
 package com.ufu.tcc.commonsdomain.model;
 
 import com.ufu.tcc.commonsdomain.enums.ReserveStatus;
+import jakarta.persistence.Cache;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -8,16 +10,17 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 import java.util.Date;
 
 @Entity
-@Table(name = "reserve")
+@Table(name = "reserve", schema = "hotel_tcc")
 public class Reserve {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hotel_tcc.reserve_seq")
     private Long id;
 
     @Column(name = "reserve_begin")
@@ -26,11 +29,11 @@ public class Reserve {
     @Column(name = "reserve_end")
     private Date reserveEnd;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "hotel_room_id")
     private HotelRoom hotelRoomId;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
