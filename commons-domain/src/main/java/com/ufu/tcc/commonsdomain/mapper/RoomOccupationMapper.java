@@ -16,7 +16,11 @@ public class RoomOccupationMapper {
     }
 
     public RoomOccupationRecord toRecord(RoomOccupation roomOccupation) {
-        return new RoomOccupationRecord(hotelRoomMapper.toRecord(roomOccupation.getHotelRoom()), roomOccupation.getRoomOccupationDateBegin(), roomOccupation.getRoomOccupationDateEnd(), roomOccupation.getOccupation());
+        return new RoomOccupationRecord(
+                hotelRoomMapper.toRecord(roomOccupation.getHotelRoom()),
+                roomOccupation.getRoomOccupationDateBegin(),
+                roomOccupation.getRoomOccupationDateEnd(),
+                roomOccupation.getOccupation());
     }
 
     public RoomOccupation toModel(RoomOccupationRecord roomOccupationRecord) {

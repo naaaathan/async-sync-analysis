@@ -4,6 +4,8 @@ import com.ufu.tcc.commonsdomain.enums.Occupation;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,10 +20,10 @@ import java.util.Date;
 public class RoomOccupation {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "hotel_tcc.room_occupation_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hotel_tcc.room_occupation_seq")
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "hotel_room_id")
     private HotelRoom hotelRoom;
 
@@ -32,6 +34,7 @@ public class RoomOccupation {
     private Date roomOccupationDateEnd;
 
     @Column(name = "occupation")
+    @Enumerated(EnumType.STRING)
     private Occupation occupation;
 
     public Long getId() {

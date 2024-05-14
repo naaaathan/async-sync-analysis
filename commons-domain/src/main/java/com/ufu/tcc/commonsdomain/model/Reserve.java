@@ -5,6 +5,8 @@ import jakarta.persistence.Cache;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -29,15 +31,16 @@ public class Reserve {
     @Column(name = "reserve_end")
     private Date reserveEnd;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "hotel_room_id")
     private HotelRoom hotelRoomId;
 
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
     @Column(name = "status")
+    @Enumerated(value = EnumType.STRING)
     private ReserveStatus status;
 
 

@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 public class Hotel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hotel_tcc.hotel_seq")
     private Long id;
 
     @Column(name = "hotel_name")

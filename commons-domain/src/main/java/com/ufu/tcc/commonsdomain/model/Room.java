@@ -12,7 +12,7 @@ import jakarta.persistence.Table;
 public class Room {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hotel_tcc.room_seq")
     private Long id;
 
     @Column(name = "room_name")

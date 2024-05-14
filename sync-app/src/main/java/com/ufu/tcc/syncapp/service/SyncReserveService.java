@@ -50,6 +50,7 @@ public class SyncReserveService implements ReserveService {
     }
 
     @Override
+    @Transactional
     public void reserveHotelRoom(Long customerId, ReserveDataRecord reserveDataRecord, PaymentMethod paymentMethod) {
 
         List<RoomOccupation> roomOccupations = roomOccupationService.findRoomOccupationByHotelRoomIdAndDates(

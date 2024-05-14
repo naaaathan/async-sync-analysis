@@ -1,10 +1,41 @@
 CREATE SCHEMA IF NOT EXISTS HOTEL_TCC;
 SET search_path TO HOTEL_TCC;
 
-CREATE SEQUENCE if not exists reserve_seq START 1;
-CREATE SEQUENCE if not exists room_occupation_seq START 1;
-CREATE SEQUENCE if not exists hotel_room_seq START 1;
-CREATE SEQUENCE if not exists customer_seq START 1;
+CREATE SEQUENCE if not exists hotel_seq
+    INCREMENT BY 1
+    START WITH 1
+    MINVALUE 1
+    NO MAXVALUE;
+
+CREATE SEQUENCE if not exists room_seq
+    INCREMENT BY 1
+    START WITH 1
+    MINVALUE 1
+    NO MAXVALUE;
+
+CREATE SEQUENCE if not exists reserve_seq
+    INCREMENT BY 1
+    START WITH 1
+    MINVALUE 1
+    NO MAXVALUE;
+
+CREATE SEQUENCE if not exists room_occupation_seq
+    INCREMENT BY 1
+    START WITH 1
+    MINVALUE 1
+    NO MAXVALUE;
+
+CREATE SEQUENCE if not exists hotel_room_seq
+    INCREMENT BY 1
+    START WITH 1
+    MINVALUE 1
+    NO MAXVALUE;
+
+CREATE SEQUENCE if not exists customer_seq
+    INCREMENT BY 1
+    START WITH 1
+    MINVALUE 1
+    NO MAXVALUE;
 
 CREATE TABLE IF NOT EXISTS HOTEL_TCC.hotel (
     id BIGINT NOT NULL,

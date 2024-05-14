@@ -13,6 +13,7 @@ public class CustomerMapper {
 
     public Customer toModel(CustomerRecord customerRecord) {
         Customer customer = new Customer();
+        customer.setId(customerRecord.customerId());
         customer.setCustomerName(customerRecord.customerName());
         return customer;
     }

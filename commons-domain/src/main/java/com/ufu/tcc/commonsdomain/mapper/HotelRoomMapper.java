@@ -8,11 +8,12 @@ import org.springframework.stereotype.Component;
 public class HotelRoomMapper {
 
     public HotelRoomRecord toRecord(HotelRoom hotelRoom) {
-        return new HotelRoomRecord(hotelRoom.getHotelId(), hotelRoom.getRoomId());
+        return new HotelRoomRecord(hotelRoom.getId(), hotelRoom.getHotelId(), hotelRoom.getRoomId());
     }
 
     public HotelRoom toModel(HotelRoomRecord hotelRoomRecord) {
         HotelRoom hotelRoom = new HotelRoom();
+        hotelRoom.setId(hotelRoomRecord.hotelRoomId());
         hotelRoom.setHotelId(hotelRoomRecord.hotelId());
         hotelRoom.setRoomId(hotelRoomRecord.roomId());
         return hotelRoom;
