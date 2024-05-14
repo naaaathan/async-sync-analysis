@@ -1,6 +1,6 @@
 package com.ufu.tcc.commonsdomain.records;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
-public record ReserveDataRecord(Date reserveBegin, Date reserveEnd, Long hotelRoomId, PaymentMethod paymentMethod){
+public record ReserveDataRecord(LocalDateTime reserveBegin, LocalDateTime reserveEnd, Long hotelRoomId, PaymentMethod paymentMethod){
 }

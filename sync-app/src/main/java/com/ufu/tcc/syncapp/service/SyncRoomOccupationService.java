@@ -5,15 +5,17 @@ import com.ufu.tcc.commonsdomain.mapper.RoomOccupationMapper;
 import com.ufu.tcc.commonsdomain.model.HotelRoom;
 import com.ufu.tcc.commonsdomain.model.RoomOccupation;
 import com.ufu.tcc.commonsdomain.records.HotelRoomRecord;
-import com.ufu.tcc.commonsdomain.records.ReserveDataRecord;
-import com.ufu.tcc.commonsdomain.records.RoomOccupationRecord;
+import com.ufu.tcc.commonsdomain.records.request.RoomOccupationRequestRecord;
+import com.ufu.tcc.commonsdomain.records.response.RoomOccupationResponseRecord;
 import com.ufu.tcc.commonsdomain.repository.RoomOccupationRepository;
 import com.ufu.tcc.commonsdomain.service.HotelRoomService;
 import com.ufu.tcc.commonsdomain.service.RoomOccupationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,7 +34,7 @@ public class SyncRoomOccupationService implements RoomOccupationService {
 
 
     @Override
-    public List<RoomOccupation> findRoomOccupationByHotelRoomIdAndDates(Long hotelRoomId, Date reserveBegin, Date reserveEnd) {
+    public List<RoomOccupation> findRoomOccupationByHotelRoomIdAndDates(Long hotelRoomId, LocalDateTime reserveBegin, LocalDateTime reserveEnd) {
 
         HotelRoom hotelRoom = hotelRoomService.findHotelById(hotelRoomId);
 
@@ -40,10 +42,8 @@ public class SyncRoomOccupationService implements RoomOccupationService {
                 .findRoomOccupationByHotelRoomAndRoomOccupationDateBeginGreaterThanEqualAndRoomOccupationDateEndLessThanEqual(hotelRoom, reserveBegin, reserveEnd);
     }
 
-    public void save(HotelRoomRecord hotelRoomRecord, ReserveDataRecord reserveDataRecord) {
-
-        RoomOccupationRecord roomOccupationRecord = new RoomOccupationRecord(hotelRoomRecord, reserveDataRecord.reserveBegin(), reserveDataRecord.reserveEnd(), Occupation.OCCUPIED);
-        this.roomOccupationRepository.save(roomOccupationMapper.toModel(roomOccupationRecord));
+    public RoomOccupation save(RoomOccupation roomOccupation) {
+        return this.roomOccupationRepository.save(roomOccupation);
     }
 
     @Override
@@ -52,5 +52,31 @@ public class SyncRoomOccupationService implements RoomOccupationService {
             roomOccupation.setOccupation(occupation);
             this.roomOccupationRepository.save(roomOccupation);
         });
+    }
+
+    @Override
+    public RoomOccupationResponseRecord createRoomOccupation(RoomOccupationRequestRecord roomOccupationRecord) {
+
+        HotelRoomRecord hotelRoomRecord = hotelRoomService.findHotelRecordRoomById(roomOccupationRecord.hotelRoom().hotelRoomId());
+
+        return roomOccupationMapper.toResponseRecord(this.save(roomOccupationMapper.fromRequestToModel(roomOccupationRecord, hotelRoomRecord)));
+    }
+
+    @Override
+    public List<RoomOccupationResponseRecord> createRoomOccupationBatch(RoomOccupationRequestRecord roomOccupationRecord) {
+
+        HotelRoomRecord hotelRoomRecord = hotelRoomService.findHotelRecordRoomById(roomOccupationRecord.hotelRoom().hotelRoomId());
+
+        LocalDateTime beginOccupationDate = roomOccupationRecord.roomOccupationBeginDate();
+        List<RoomOccupationResponseRecord> occupationResponseRecords = new ArrayList<>();
+
+        while (beginOccupationDate.isBefore(roomOccupationRecord.roomOccupationEndDate())) {
+            occupationResponseRecords.add(
+                    roomOccupationMapper.toResponseRecord(this.save(roomOccupationMapper.fromRequestToModel(roomOccupationRecord, hotelRoomRecord)))
+            );
+
+            beginOccupationDate = beginOccupationDate.plus(Duration.ofDays(1));
+        }
+        return occupationResponseRecords;
     }
 }

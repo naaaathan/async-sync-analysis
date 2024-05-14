@@ -5,12 +5,12 @@ import com.ufu.tcc.commonsdomain.model.RoomOccupation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
 public interface RoomOccupationRepository extends JpaRepository<RoomOccupation, Long> {
 
-    List<RoomOccupation> findRoomOccupationByHotelRoomAndRoomOccupationDateBeginGreaterThanEqualAndRoomOccupationDateEndLessThanEqual(HotelRoom hotelRoom, Date begin, Date end);
+    List<RoomOccupation> findRoomOccupationByHotelRoomAndRoomOccupationDateBeginGreaterThanEqualAndRoomOccupationDateEndLessThanEqual(HotelRoom hotelRoom, LocalDateTime begin, LocalDateTime end);
 
 }

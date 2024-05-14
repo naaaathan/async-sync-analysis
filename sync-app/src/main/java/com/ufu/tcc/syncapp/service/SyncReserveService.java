@@ -2,6 +2,7 @@ package com.ufu.tcc.syncapp.service;
 
 import com.ufu.tcc.commonsdomain.clients.PaymentClient;
 import com.ufu.tcc.commonsdomain.enums.Occupation;
+import com.ufu.tcc.commonsdomain.enums.PaymentStatus;
 import com.ufu.tcc.commonsdomain.enums.ReserveStatus;
 import com.ufu.tcc.commonsdomain.exception.NoRoomOccupationFoundException;
 import com.ufu.tcc.commonsdomain.mapper.ReserveMapper;
@@ -9,6 +10,7 @@ import com.ufu.tcc.commonsdomain.model.RoomOccupation;
 import com.ufu.tcc.commonsdomain.records.CustomerRecord;
 import com.ufu.tcc.commonsdomain.records.HotelRoomRecord;
 import com.ufu.tcc.commonsdomain.records.PaymentMethod;
+import com.ufu.tcc.commonsdomain.records.PaymentResponse;
 import com.ufu.tcc.commonsdomain.records.ReserveDataRecord;
 import com.ufu.tcc.commonsdomain.records.ReserveRecord;
 import com.ufu.tcc.commonsdomain.repository.ReserveRepository;
@@ -66,10 +68,9 @@ public class SyncReserveService implements ReserveService {
         );
 
         if (roomOccupations.isEmpty()) {
-            //throw new NoRoomOccupationFoundException();
+            throw new NoRoomOccupationFoundException();
         }
 
-        // Customers may see the same date available, but only one can reserve it then we use PESSIMISTIC_READ
         lockRoomsThatWillPossiblyBeOccupied(roomOccupations);
 
         HotelRoomRecord hotelRoomRecord = hotelRoomService.findHotelRecordRoomById(reserveDataRecord.hotelRoomId());
@@ -83,7 +84,11 @@ public class SyncReserveService implements ReserveService {
                 }
         );
 
-        paymentClient.processPayment(paymentMethod);
+        PaymentResponse paymentResponse = paymentClient.processPayment(paymentMethod).getBody();
+
+        if (paymentResponse != null && !PaymentStatus.SUCCESS.name().equals(paymentResponse.status())) {
+            throw new RuntimeException("Payment failed");
+        }
 
         this.save(customerRecord, reserveDataRecord, hotelRoomRecord);
 
@@ -91,6 +96,8 @@ public class SyncReserveService implements ReserveService {
     }
 
     private void lockRoomsThatWillPossiblyBeOccupied(List<RoomOccupation> roomOccupations) {
+
+        // Customers may see the same date available, but only one can reserve it then we use PESSIMISTIC_READ
         roomOccupations.forEach(
                 roomOccupation -> entityManager.lock(roomOccupation, LockModeType.PESSIMISTIC_READ)
         );

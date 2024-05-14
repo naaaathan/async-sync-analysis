@@ -15,7 +15,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "reserve", schema = "hotel_tcc")
@@ -23,13 +23,14 @@ public class Reserve {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hotel_tcc.reserve_seq")
+    @SequenceGenerator(name = "hotel_tcc.reserve_seq", sequenceName = "hotel_tcc.reserve_seq", allocationSize = 1, schema = "hotel_tcc")
     private Long id;
 
     @Column(name = "reserve_begin")
-    private Date reserveBegin;
+    private LocalDateTime reserveBegin;
 
     @Column(name = "reserve_end")
-    private Date reserveEnd;
+    private LocalDateTime reserveEnd;
 
     @ManyToOne
     @JoinColumn(name = "hotel_room_id")
@@ -52,19 +53,19 @@ public class Reserve {
         this.id = id;
     }
 
-    public Date getReserveBegin() {
+    public LocalDateTime getReserveBegin() {
         return reserveBegin;
     }
 
-    public void setReserveBegin(Date reserveBegin) {
+    public void setReserveBegin(LocalDateTime reserveBegin) {
         this.reserveBegin = reserveBegin;
     }
 
-    public Date getReserveEnd() {
+    public LocalDateTime getReserveEnd() {
         return reserveEnd;
     }
 
-    public void setReserveEnd(Date reserveEnd) {
+    public void setReserveEnd(LocalDateTime reserveEnd) {
         this.reserveEnd = reserveEnd;
     }
 

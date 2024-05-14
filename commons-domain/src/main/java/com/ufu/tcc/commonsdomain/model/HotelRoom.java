@@ -6,6 +6,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
@@ -14,6 +15,7 @@ public class HotelRoom {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hotel_tcc.hotel_room_seq")
+    @SequenceGenerator(name = "hotel_tcc.hotel_room_seq", sequenceName = "hotel_tcc.hotel_room_seq", allocationSize = 1, schema = "hotel_tcc")
     private Long id;
 
     @ManyToOne

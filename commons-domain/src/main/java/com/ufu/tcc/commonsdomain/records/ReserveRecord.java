@@ -3,6 +3,6 @@ package com.ufu.tcc.commonsdomain.records;
 
 import com.ufu.tcc.commonsdomain.enums.ReserveStatus;
 
-import java.util.Date;
+import java.time.LocalDateTime;
 
-public record ReserveRecord(CustomerRecord customerRecord, Date reserveBegin, Date reserveEnd, HotelRoomRecord hotelRoom, ReserveStatus reserveStatus){}
+public record ReserveRecord(CustomerRecord customerRecord, LocalDateTime reserveBegin, LocalDateTime reserveEnd, HotelRoomRecord hotelRoom, ReserveStatus reserveStatus){}

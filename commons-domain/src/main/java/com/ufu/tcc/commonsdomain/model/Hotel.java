@@ -5,6 +5,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
@@ -13,6 +14,7 @@ public class Hotel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "hotel_tcc.hotel_seq")
+    @SequenceGenerator(name = "hotel_tcc.hotel_seq", sequenceName = "hotel_tcc.hotel_seq", allocationSize = 1, schema = "hotel_tcc")
     private Long id;
 
     @Column(name = "hotel_name")

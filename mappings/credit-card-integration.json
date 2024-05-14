@@ -6,7 +6,7 @@
 
   "response": {
     "status": 200,
-    "body": "{ \"status\": \"success\" }",
+    "body": "{ \"status\": \"SUCCESS\" }",
     "headers": {
       "Content-Type": "application/json"
     },
