@@ -1,0 +1,15 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/credit-card/process"
+  },
+
+  "response": {
+    "status": 200,
+    "body": "{ \"status\": \"success\" }",
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "fixedDelayMilliseconds": 800
+  }
+}

@@ -1,7 +1,9 @@
 package com.ufu.tcc.syncapp.service;
 
+import com.ufu.tcc.commonsdomain.clients.PaymentClient;
 import com.ufu.tcc.commonsdomain.enums.Occupation;
 import com.ufu.tcc.commonsdomain.enums.ReserveStatus;
+import com.ufu.tcc.commonsdomain.exception.NoRoomOccupationFoundException;
 import com.ufu.tcc.commonsdomain.mapper.ReserveMapper;
 import com.ufu.tcc.commonsdomain.model.RoomOccupation;
 import com.ufu.tcc.commonsdomain.records.CustomerRecord;
@@ -31,6 +33,7 @@ public class SyncReserveService implements ReserveService {
     private final ReserveMapper reserveMapper;
     private final CustomerService customerService;
     private final RoomOccupationService roomOccupationService;
+    private final PaymentClient paymentClient;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -41,12 +44,15 @@ public class SyncReserveService implements ReserveService {
             ReserveRepository reserveRepository,
             ReserveMapper reserveMapper,
             CustomerService customerService,
-            RoomOccupationService roomOccupationService) {
+            RoomOccupationService roomOccupationService,
+            PaymentClient paymentClient
+    ) {
         this.hotelRoomService = hotelRoomService;
         this.reserveRepository = reserveRepository;
         this.reserveMapper = reserveMapper;
         this.customerService = customerService;
         this.roomOccupationService = roomOccupationService;
+        this.paymentClient = paymentClient;
     }
 
     @Override
@@ -58,6 +64,10 @@ public class SyncReserveService implements ReserveService {
                 reserveDataRecord.reserveBegin(),
                 reserveDataRecord.reserveEnd()
         );
+
+        if (roomOccupations.isEmpty()) {
+            //throw new NoRoomOccupationFoundException();
+        }
 
         // Customers may see the same date available, but only one can reserve it then we use PESSIMISTIC_READ
         lockRoomsThatWillPossiblyBeOccupied(roomOccupations);
@@ -73,13 +83,11 @@ public class SyncReserveService implements ReserveService {
                 }
         );
 
+        paymentClient.processPayment(paymentMethod);
+
         this.save(customerRecord, reserveDataRecord, hotelRoomRecord);
 
-        if(roomOccupations.isEmpty()) {
-            roomOccupationService.save(hotelRoomRecord, reserveDataRecord);
-        }else {
-            roomOccupationService.update(roomOccupations, Occupation.OCCUPIED);
-        }
+        roomOccupationService.update(roomOccupations, Occupation.OCCUPIED);
     }
 
     private void lockRoomsThatWillPossiblyBeOccupied(List<RoomOccupation> roomOccupations) {
