@@ -8,8 +8,9 @@ Neste projeto utilizamos as seguintes tecnologias:
 
 - **Linguagem**: Java 17
 - **Banco de Dados**: Postgres
-- **Testes de Desempenho**: JMeter
+- **Testes de Desempenho**: Gatling
 - **Gerenciamento de Containers**: Docker Compose
+- **Filas de Mensagens**: Amazon SQS
 
 ## Estrutura do Projeto
 
@@ -17,4 +18,31 @@ O projeto está organizado da seguinte forma:
 
 - **sync-app**: Aplicação web backend síncrona
 - **async-app**: Aplicação web backend assíncrona
+- **commons-domain**: Módulo de domínio compartilhado entre as aplicações
 
+## Arquitetura das aplicações
+
+- **Síncrona**
+    - A aplicação síncrona é constituida de uma aplicação web backend que expõe uma API REST. Essa aplicação se comunica com o banco de dados relacional via driver JDBC. Além disso, faz requisições a um sistema de pagamento utilizando requisições HTTP, usando arquitetura REST.
+
+![Arquitetura síncrona](./images/architecture-sync.png)
+
+- **Assíncrona**
+    - A aplicação assíncrona também é constituida de uma aplicação web backend que expõe uma API REST. Entretanto, para as operações de comunicação e I/O, as requisições enfileiram mensagens em uma fila de mensagens. Essas mensagens são consumidas por um consumidor(thread) da aplicação que realiza a operação de I/O ou comunicação.
+  
+![Arquitetura síncrona](./images/architecture-async.png)
+
+## Regra de negócio da aplicação
+
+Essa aplicação consiste em um sistema online de reserva de acomodações em hotéis. Um sistema similar ao Booking.com, por exemplo.
+
+Os requisitos da aplicação são: 
+
+Para os clientes:
+  1. Devem ser capazes de fazer pesquisas por um hotel em uma região. Também
+   devem poder usar filtro com um range de preço, número de estrelas do hotel,
+   piscina, etc.
+  2. Devem ser capazes de fazer a reserva no hotel
+  3. Assim que fizerem a reserva, devem ser capazes de ver sua reserva
+  4. O cliente deve receber uma confirmação/notificação da sua reserva no
+   número de celular ou email
