@@ -46,3 +46,10 @@ Para os clientes:
   3. Assim que fizerem a reserva, devem ser capazes de ver sua reserva
   4. O cliente deve receber uma confirmação/notificação da sua reserva no
    número de celular ou email
+
+## Estrutura banco de dados
+
+Diagrama uml representanto as entidades do banco de dados bem como seus relacionamentos.
+
+![Diagrama do banco de dados](./images/database-uml.drawio.png)
+
