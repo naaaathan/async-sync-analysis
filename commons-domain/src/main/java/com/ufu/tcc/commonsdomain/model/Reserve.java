@@ -1,8 +1,6 @@
 package com.ufu.tcc.commonsdomain.model;
 
 import com.ufu.tcc.commonsdomain.enums.ReserveStatus;
-import jakarta.persistence.Cache;
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -38,7 +36,7 @@ public class Reserve {
 
     @ManyToOne
     @JoinColumn(name = "customer_id")
-    private Customer customer;
+    private User user;
 
     @Column(name = "status")
     @Enumerated(value = EnumType.STRING)
@@ -85,11 +83,11 @@ public class Reserve {
         this.status = status;
     }
 
-    public Customer getCustomer() {
-        return customer;
+    public User getCustomer() {
+        return user;
     }
 
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
+    public void setCustomer(User user) {
+        this.user = user;
     }
 }

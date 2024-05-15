@@ -31,7 +31,7 @@ CREATE SEQUENCE if not exists hotel_room_seq
     MINVALUE 1
     NO MAXVALUE;
 
-CREATE SEQUENCE if not exists customer_seq
+CREATE SEQUENCE if not exists user_seq
     INCREMENT BY 1
     START WITH 1
     MINVALUE 1
@@ -72,9 +72,11 @@ CREATE TABLE IF NOT EXISTS HOTEL_TCC.room_occupation(
     constraint fk_room_occupation_hotel_room foreign key (hotel_room_id) references hotel_room(id)
 );
 
-CREATE TABLE IF NOT EXISTS HOTEL_TCC.customer(
+CREATE TABLE IF NOT EXISTS HOTEL_TCC.user(
     id BIGINT NOT NULL,
-    customer_name VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL,
     constraint pk_customer primary key (id)
 );
 

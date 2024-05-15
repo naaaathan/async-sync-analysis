@@ -21,6 +21,7 @@ dependencies {
 	implementation project(':commons-domain')
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.1.1'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 }
 
 task prepareKotlinBuildScriptModel {

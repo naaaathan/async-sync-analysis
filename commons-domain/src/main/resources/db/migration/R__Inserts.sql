@@ -1,7 +1,7 @@
-INSERT INTO hotel_tcc.customer
-    (id, customer_name)
+INSERT INTO hotel_tcc.user
+    (id, name, email, role)
 VALUES
-    (nextval('hotel_tcc.customer_seq'), 'John Doe') on conflict do nothing;
+    (nextval('hotel_tcc.user_seq'), 'Nathan Augusto', 'nathan.caugusto@gmail.com','MANAGER') on conflict do nothing;
 
 INSERT INTO hotel_tcc.hotel
     (id, hotel_name, hotel_address)
