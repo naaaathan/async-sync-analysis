@@ -17,8 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user")
 public class UserController {
 
-
-    private JdbcUserDetailsManager jdbcUserDetailsManager;
+    private final JdbcUserDetailsManager jdbcUserDetailsManager;
 
     @Autowired
     public UserController(JdbcUserDetailsManager jdbcUserDetailsManager) {
