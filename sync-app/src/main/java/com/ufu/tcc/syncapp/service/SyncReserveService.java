@@ -18,6 +18,7 @@ import com.ufu.tcc.commonsdomain.service.CustomerService;
 import com.ufu.tcc.commonsdomain.service.HotelRoomService;
 import com.ufu.tcc.commonsdomain.service.ReserveService;
 import com.ufu.tcc.commonsdomain.service.RoomOccupationService;
+import com.ufu.tcc.commonsdomain.service.SESService;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
@@ -36,6 +37,7 @@ public class SyncReserveService implements ReserveService {
     private final CustomerService customerService;
     private final RoomOccupationService roomOccupationService;
     private final PaymentClient paymentClient;
+    private final SESService sesService;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -47,7 +49,8 @@ public class SyncReserveService implements ReserveService {
             ReserveMapper reserveMapper,
             CustomerService customerService,
             RoomOccupationService roomOccupationService,
-            PaymentClient paymentClient
+            PaymentClient paymentClient,
+            SESService sesService
     ) {
         this.hotelRoomService = hotelRoomService;
         this.reserveRepository = reserveRepository;
@@ -55,6 +58,7 @@ public class SyncReserveService implements ReserveService {
         this.customerService = customerService;
         this.roomOccupationService = roomOccupationService;
         this.paymentClient = paymentClient;
+        this.sesService = sesService;
     }
 
     @Override
@@ -93,6 +97,13 @@ public class SyncReserveService implements ReserveService {
         this.save(customerRecord, reserveDataRecord, hotelRoomRecord);
 
         roomOccupationService.update(roomOccupations, Occupation.OCCUPIED);
+
+        sesService.sendEmail(
+                "reserve@reserve.com",
+                customerRecord.email(),
+                "Reserve confirmed",
+                "Your reserve has been confirmed"
+        );
     }
 
     private void lockRoomsThatWillPossiblyBeOccupied(List<RoomOccupation> roomOccupations) {

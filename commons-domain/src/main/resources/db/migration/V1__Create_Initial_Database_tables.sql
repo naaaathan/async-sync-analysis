@@ -65,8 +65,8 @@ CREATE TABLE IF NOT EXISTS HOTEL_TCC.hotel_room (
 CREATE TABLE IF NOT EXISTS HOTEL_TCC.room_occupation(
     id BIGINT NOT NULL,
     hotel_room_id BIGINT NOT NULL,
-    room_occupation_begin DATE NOT NULL,
-    room_occupation_end DATE NOT NULL,
+    room_occupation_begin TIMESTAMP NOT NULL,
+    room_occupation_end TIMESTAMP NOT NULL,
     occupation VARCHAR(50) NOT NULL,
     constraint pk_room_occupation primary key (id),
     constraint fk_room_occupation_hotel_room foreign key (hotel_room_id) references hotel_room(id)
@@ -83,8 +83,8 @@ CREATE TABLE IF NOT EXISTS HOTEL_TCC.user(
 CREATE TABLE IF NOT EXISTS HOTEL_TCC.reserve(
     id BIGINT NOT NULL,
     customer_id BIGINT NOT NULL,
-    reserve_begin DATE NOT NULL,
-    reserve_end DATE NOT NULL,
+    reserve_begin TIMESTAMP NOT NULL,
+    reserve_end TIMESTAMP NOT NULL,
     hotel_room_id BIGINT NOT NULL,
     status VARCHAR(50) NOT NULL,
     constraint pk_reserve primary key (id),

@@ -30,7 +30,6 @@ public class User {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    private String password;
 
     public Long getId() {
         return id;
@@ -46,5 +45,21 @@ public class User {
 
     public void setName(String customerName) {
         this.name = customerName;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
     }
 }

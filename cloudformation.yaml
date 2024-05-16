@@ -1,0 +1,9 @@
+Resources:
+  HotelReservationQueue:
+    Type: 'AWS::SQS::Queue'
+    Properties:
+      QueueName: hotel_reservation_queue
+  HotelReservationMailConfigurationSet:
+    Type: 'AWS::SES::ConfigurationSet'
+    Properties:
+      Name: MailConfigurationSet

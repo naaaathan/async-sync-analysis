@@ -5,6 +5,7 @@ import com.ufu.tcc.commonsdomain.mapper.RoomOccupationMapper;
 import com.ufu.tcc.commonsdomain.model.HotelRoom;
 import com.ufu.tcc.commonsdomain.model.RoomOccupation;
 import com.ufu.tcc.commonsdomain.records.HotelRoomRecord;
+import com.ufu.tcc.commonsdomain.records.RoomOccupationRecord;
 import com.ufu.tcc.commonsdomain.records.request.RoomOccupationRequestRecord;
 import com.ufu.tcc.commonsdomain.records.response.RoomOccupationResponseRecord;
 import com.ufu.tcc.commonsdomain.repository.RoomOccupationRepository;
@@ -71,8 +72,15 @@ public class SyncRoomOccupationService implements RoomOccupationService {
         List<RoomOccupationResponseRecord> occupationResponseRecords = new ArrayList<>();
 
         while (beginOccupationDate.isBefore(roomOccupationRecord.roomOccupationEndDate())) {
+
+            RoomOccupationRequestRecord singleOccupation = new RoomOccupationRequestRecord(
+                    roomOccupationRecord.hotelRoom(),
+                    beginOccupationDate,
+                    beginOccupationDate.plus(Duration.ofMinutes(1439))
+            );
+
             occupationResponseRecords.add(
-                    roomOccupationMapper.toResponseRecord(this.save(roomOccupationMapper.fromRequestToModel(roomOccupationRecord, hotelRoomRecord)))
+                    roomOccupationMapper.toResponseRecord(this.save(roomOccupationMapper.fromRequestToModel(singleOccupation, hotelRoomRecord)))
             );
 
             beginOccupationDate = beginOccupationDate.plus(Duration.ofDays(1));
