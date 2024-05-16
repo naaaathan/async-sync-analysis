@@ -30,7 +30,7 @@ flyway {
     url = 'jdbc:postgresql://localhost:5432/tcc'
     user = 'postgres'
     password = 'postgres'
-    locations = ['classpath:db/migration']
+    locations = ['classpath:db/migration','classpath:db/migration-security']
 }
 
 

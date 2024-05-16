@@ -1,5 +1,6 @@
 package com.ufu.tcc.commonsdomain.config;
 
+import com.ufu.tcc.commonsdomain.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,11 +18,20 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+
+import javax.sql.DataSource;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
+
+    private final DataSource dataSource;
+
+    public SecurityConfig(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -32,8 +42,7 @@ public class SecurityConfig {
                             .requestMatchers("/user-login").permitAll()
                             .anyRequest().authenticated()
                 )
-                .httpBasic(Customizer.withDefaults())
-                .formLogin(Customizer.withDefaults());
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
@@ -44,6 +53,7 @@ public class SecurityConfig {
             UserDetailsService userDetailsService,
             PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+
         authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder);
 
@@ -52,17 +62,29 @@ public class SecurityConfig {
 
         return providerManager;
     }
-    
+
 
     @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails userDetails = User.withDefaultPasswordEncoder()
-                .username("user")
-                .password("password")
-                .roles("USER")
-                .build();
+    public JdbcUserDetailsManager userDetailsService() {
+        JdbcUserDetailsManager jdbcUserDetailsManager = new JdbcUserDetailsManager(dataSource);
 
-        return new InMemoryUserDetailsManager(userDetails);
+        jdbcUserDetailsManager.setCreateUserSql("INSERT INTO hotel_tcc.users (username, password, enabled) VALUES (?, ?, ?)");
+        jdbcUserDetailsManager.setCreateAuthoritySql("INSERT INTO hotel_tcc.authorities (username, authority) VALUES (?, ?)");
+        jdbcUserDetailsManager.setUserExistsSql("SELECT username FROM hotel_tcc.users WHERE username = ?");
+        jdbcUserDetailsManager.setUsersByUsernameQuery("SELECT username, password, enabled FROM hotel_tcc.users WHERE username = ?");
+        jdbcUserDetailsManager.setAuthoritiesByUsernameQuery("SELECT username, authority FROM hotel_tcc.authorities WHERE username = ?");
+
+        if (!jdbcUserDetailsManager.userExists("admin")) {
+            UserDetails userDetails = User.builder()
+                    .username("admin")
+                    .password("{bcrypt}$2a$10$A28j4KJgFe7W2TU2Zd9lJesCLQfGv7GJkxp1KihEGpWfmH3FfitsO")
+                    .roles(Role.MANAGER.name())
+                    .build();
+
+            jdbcUserDetailsManager.createUser(userDetails);
+        }
+
+        return jdbcUserDetailsManager;
     }
 
 
