@@ -48,6 +48,7 @@ Para os clientes:
   3. Assim que fizerem a reserva, devem ser capazes de ver sua reserva.
   4. O cliente deve receber uma confirmação/notificação da sua reserva no
    número de celular ou email.
+
 Para o manager:
   1. Devem ser capazes de se cadastrarem na plataforma, adicionando as
   informações do hotel.
