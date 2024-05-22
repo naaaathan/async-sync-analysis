@@ -2,6 +2,8 @@
 
 Este projeto faz parte do Trabalho de Conclusão de Curso (TCC) do curso de Bacharelado em Ciência da Computação da Universidade Federal de Uberlândia (UFU). O objetivo deste trabalho é realizar uma avaliação comparativa entre abordagens síncronas e assíncronas no desenvolvimento de sistemas web backend. 
 
+Caso tenha interesse na leitura do trabalho (ainda em desenvolvimento), o mesmo está disponível [aqui](./paper/TCC_v1.pdf).
+
 Para isso, neste projeto serão/foram desenvolvidas duas aplicações web (sync-app/async-app) de exemplo utilizando as duas abordagens e, em seguida, serão/foram realizados testes de desempenho e escalabilidade.
 
 Neste projeto utilizamos as seguintes tecnologias:
@@ -52,4 +54,12 @@ Para os clientes:
 Diagrama uml representanto as entidades do banco de dados bem como seus relacionamentos.
 
 ![Diagrama do banco de dados](./images/database-uml.drawio.png)
+
+## Rodando a aplicação
+
+Para rodar a aplicação, é necessário ter o Docker e o Docker Compose instalados na máquina.
+
+1. `docker-compose up -d`
+2. `./aws/create-stack.sh`
+3. `Rodar o jar da aplicação sync-app ou async-app`
 
