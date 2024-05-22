@@ -44,10 +44,16 @@ Para os clientes:
   1. Devem ser capazes de fazer pesquisas por um hotel em uma região. Também
    devem poder usar filtro com um range de preço, número de estrelas do hotel,
    piscina, etc.
-  2. Devem ser capazes de fazer a reserva no hotel
-  3. Assim que fizerem a reserva, devem ser capazes de ver sua reserva
+  2. Devem ser capazes de fazer a reserva no hotel.
+  3. Assim que fizerem a reserva, devem ser capazes de ver sua reserva.
   4. O cliente deve receber uma confirmação/notificação da sua reserva no
-   número de celular ou email
+   número de celular ou email.
+Para o manager:
+  1. Devem ser capazes de se cadastrarem na plataforma, adicionando as
+  informações do hotel.
+  2. Devem poder atualizar as informações do hotel, por exemplo, eles poderão
+  adicionar novos quartos, mudar o preço, adicionar novas imagens, etc.
+  3. E também devem ver como estão as reservas, os lucros por quarto, etc.
 
 ## Estrutura banco de dados
 
