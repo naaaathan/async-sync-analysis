@@ -66,7 +66,11 @@ Diagrama uml representanto as entidades do banco de dados bem como seus relacion
 
 Para rodar a aplicação, é necessário ter o Docker e o Docker Compose instalados na máquina.
 
-1. `docker-compose up -d`
+**sync-app**
+1. `docker-compose up -d sync-app`
 2. `./aws/create-stack.sh`
-3. `Rodar o jar da aplicação sync-app ou async-app`
+
+**async-app**
+1. `docker-compose up -d async-app`
+2. `./aws/create-stack.sh`
 

@@ -1,9 +1,24 @@
 #Configure docker-compose file with postgres
 version: '3.1'
 services:
-  db:
+
+  db-sync:
     image: postgres
-    restart: always
+    container_name: db-sync
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: tcc
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./data-sync:/var/lib/postgresql/data
+    networks:
+        - default
+
+  db-async:
+    image: postgres
+    container_name: db-async
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
@@ -11,7 +26,28 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - ./data:/var/lib/postgresql/data
+      - ./data-async:/var/lib/postgresql/data
+
+  sync-app:
+    build: ./sync-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db-sync
+      - wiremock
+      - localstack
+    networks:
+      - default
+
+  async-app:
+    build: ./async-app
+    ports:
+      - "8081:8080"
+    depends_on:
+      - db-async
+      - localstack
+      - wiremock
+
   wiremock:
     image: "wiremock/wiremock:latest"
     container_name: my_wiremock
@@ -20,8 +56,10 @@ services:
     entrypoint: [ "/docker-entrypoint.sh", "--global-response-templating", "--disable-gzip", "--verbose" ]
     ports:
       - "8443:8080"
+
   localstack:
     image: localstack/localstack
+    container_name: localstack
     ports:
       - "4566:4566"
       - "4571:4571"

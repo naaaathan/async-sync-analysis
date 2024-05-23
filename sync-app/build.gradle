@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.5'
 	id 'io.spring.dependency-management' version '1.1.4'
+	id 'org.flywaydb.flyway' version '10.12.0'
 }
 
 group = 'com.ufu.tcc'
@@ -23,6 +24,15 @@ dependencies {
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.1.1'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 }
+
+
+flyway {
+	url = 'jdbc:postgresql://db-sync:5432/tcc'
+	user = 'postgres'
+	password = 'postgres'
+	locations = ['classpath:db/migration','classpath:db/migration-security']
+}
+
 
 task prepareKotlinBuildScriptModel {
 
