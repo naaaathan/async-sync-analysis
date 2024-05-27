@@ -27,9 +27,14 @@ services:
       - "5432:5432"
     volumes:
       - ./data-async:/var/lib/postgresql/data
+    networks:
+        - default
 
   sync-app:
     build: ./sync-app
+    environment:
+      AWS_ACCESS_KEY_ID: test
+      AWS_SECRET_ACCESS_KEY: test
     ports:
       - "8080:8080"
     depends_on:
@@ -47,15 +52,19 @@ services:
       - db-async
       - localstack
       - wiremock
+    networks:
+      - default
 
   wiremock:
     image: "wiremock/wiremock:latest"
-    container_name: my_wiremock
+    container_name: wiremock
     volumes:
       - ./mappings:/home/wiremock/mappings
     entrypoint: [ "/docker-entrypoint.sh", "--global-response-templating", "--disable-gzip", "--verbose" ]
     ports:
       - "8443:8080"
+    networks:
+      - default
 
   localstack:
     image: localstack/localstack
@@ -70,3 +79,5 @@ services:
     volumes:
       - "./.localstack:/var/lib/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
+    networks:
+      - default
