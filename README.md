@@ -74,3 +74,10 @@ Para rodar a aplicação, é necessário ter o Docker e o Docker Compose instala
 1. `docker-compose up -d async-app`
 2. `./aws/create-stack.sh`
 
+## Rodando os testes de carga com Gatling
+
+Para rodar os testes de carga, é trocar de diretório para `gatling` e rodar o comando `./mvnw gatling:test`.
+
+Os testes serão executados e ao final, será gerado um relatório com os resultados, que pode ser acessado via browser e terá uma interface como a seguinte:
+
+![Relatório Gatling](./images/gatling-report.png)

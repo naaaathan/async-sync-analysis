@@ -41,3 +41,6 @@ data-sync/
 data-async/
 
 .localstack
+target/
+.m2/
+.mvn/

@@ -1,0 +1,15 @@
+{
+  "reserveBegin": "2024-06-${i.padLeft(2, '0')}T00:00:00",
+  "reserveEnd": "2024-06-${i.padLeft(2, '0')}T23:59:59",
+  "hotelRoomId": 1,
+  "paymentMethod": {
+    "paymentMethodType": "CREDIT_CARD",
+    "card": {
+      "number": "123456789",
+      "expirationDate": "2020-01-01",
+      "securityCode": "123",
+      "holderName": "John Doe",
+      "cvv": "123"
+    }
+  }
+}
