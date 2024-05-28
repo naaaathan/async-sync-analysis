@@ -1,4 +1,4 @@
-package computerdatabase;
+package hotelapp;
 
 import static io.gatling.javaapi.core.CoreDsl.*;
 import static io.gatling.javaapi.http.HttpDsl.*;
@@ -7,7 +7,7 @@ import io.gatling.javaapi.core.*;
 import io.gatling.javaapi.http.*;
 
 
-public class ComputerDatabaseSimulation extends Simulation {
+public class HotelAppSimulation extends Simulation {
 
     ScenarioBuilder createRoomOccupation = scenario("RoomOccupationScenario")
             .exec(
