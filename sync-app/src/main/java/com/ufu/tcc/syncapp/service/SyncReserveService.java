@@ -5,6 +5,7 @@ import com.ufu.tcc.commonsdomain.enums.Occupation;
 import com.ufu.tcc.commonsdomain.enums.PaymentStatus;
 import com.ufu.tcc.commonsdomain.enums.ReserveStatus;
 import com.ufu.tcc.commonsdomain.exception.NoRoomOccupationFoundException;
+import com.ufu.tcc.commonsdomain.exception.RoomAlreadyOccupiedException;
 import com.ufu.tcc.commonsdomain.mapper.ReserveMapper;
 import com.ufu.tcc.commonsdomain.model.RoomOccupation;
 import com.ufu.tcc.commonsdomain.records.CustomerRecord;
@@ -24,6 +25,7 @@ import jakarta.persistence.LockModeType;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -62,7 +64,7 @@ public class SyncReserveService implements ReserveService {
     }
 
     @Override
-    @Transactional
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void reserveHotelRoom(Long customerId, ReserveDataRecord reserveDataRecord, PaymentMethod paymentMethod) {
 
         List<RoomOccupation> roomOccupations = roomOccupationService.findRoomOccupationByHotelRoomIdAndDates(
@@ -75,8 +77,6 @@ public class SyncReserveService implements ReserveService {
             throw new NoRoomOccupationFoundException();
         }
 
-        lockRoomsThatWillPossiblyBeOccupied(roomOccupations);
-
         HotelRoomRecord hotelRoomRecord = hotelRoomService.findHotelRecordRoomById(reserveDataRecord.hotelRoomId());
         CustomerRecord customerRecord = customerService.findCustomerById(customerId);
 
@@ -84,7 +84,7 @@ public class SyncReserveService implements ReserveService {
                 roomOccupation -> Occupation.OCCUPIED.equals(roomOccupation.getOccupation())
         ).findAny().ifPresent(
                 roomOccupation -> {
-                    throw new RuntimeException(String.format("Room is already occupied in the date %s", roomOccupation.getRoomOccupationDateBegin()));
+                    throw new RoomAlreadyOccupiedException();
                 }
         );
 
@@ -110,7 +110,14 @@ public class SyncReserveService implements ReserveService {
 
         // Customers may see the same date available, but only one can reserve it then we use PESSIMISTIC_READ
         roomOccupations.forEach(
-                roomOccupation -> entityManager.lock(roomOccupation, LockModeType.PESSIMISTIC_READ)
+                roomOccupation -> entityManager.lock(roomOccupation, LockModeType.PESSIMISTIC_WRITE)
+        );
+    }
+
+    private void releaseLock(List<RoomOccupation> roomOccupations) {
+
+        roomOccupations.forEach(
+                roomOccupation -> entityManager.lock(roomOccupation, LockModeType.NONE)
         );
     }
 

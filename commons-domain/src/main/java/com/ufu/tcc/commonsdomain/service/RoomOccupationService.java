@@ -18,5 +18,5 @@ public interface RoomOccupationService {
 
     RoomOccupationResponseRecord createRoomOccupation(RoomOccupationRequestRecord roomOccupationRecord);
 
-    List<RoomOccupationResponseRecord> createRoomOccupationBatch(RoomOccupationRequestRecord roomOccupationRecord);
+    List<RoomOccupationResponseRecord> createRoomOccupationBatch(List<RoomOccupationRequestRecord> roomOccupationRecord);
 }

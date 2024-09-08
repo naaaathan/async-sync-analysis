@@ -63,27 +63,31 @@ public class AsyncRoomOccupationService implements RoomOccupationService {
     }
 
     @Override
-    public List<RoomOccupationResponseRecord> createRoomOccupationBatch(RoomOccupationRequestRecord roomOccupationRecord) {
+    public List<RoomOccupationResponseRecord> createRoomOccupationBatch(List<RoomOccupationRequestRecord> roomOccupationRecordList) {
 
-        HotelRoomRecord hotelRoomRecord = hotelRoomService.findHotelRecordRoomById(roomOccupationRecord.hotelRoom().hotelRoomId());
-
-        LocalDateTime beginOccupationDate = roomOccupationRecord.roomOccupationBeginDate();
         List<RoomOccupationResponseRecord> occupationResponseRecords = new ArrayList<>();
 
-        while (beginOccupationDate.isBefore(roomOccupationRecord.roomOccupationEndDate())) {
+        roomOccupationRecordList.forEach(roomOccupationRecord -> {
 
-            RoomOccupationRequestRecord singleOccupation = new RoomOccupationRequestRecord(
-                    roomOccupationRecord.hotelRoom(),
-                    beginOccupationDate,
-                    beginOccupationDate.plus(Duration.ofMinutes(1439))
-            );
+            HotelRoomRecord hotelRoomRecord = hotelRoomService.findHotelRecordRoomById(roomOccupationRecord.hotelRoom().hotelRoomId());
 
-            occupationResponseRecords.add(
-                    roomOccupationMapper.toResponseRecord(this.save(roomOccupationMapper.fromRequestToModel(singleOccupation, hotelRoomRecord)))
-            );
+            LocalDateTime beginOccupationDate = roomOccupationRecord.roomOccupationBeginDate();
 
-            beginOccupationDate = beginOccupationDate.plus(Duration.ofDays(1));
-        }
+            while (beginOccupationDate.isBefore(roomOccupationRecord.roomOccupationEndDate())) {
+
+                RoomOccupationRequestRecord singleOccupation = new RoomOccupationRequestRecord(
+                        roomOccupationRecord.hotelRoom(),
+                        beginOccupationDate,
+                        beginOccupationDate.plus(Duration.ofMinutes(1439))
+                );
+
+                occupationResponseRecords.add(
+                        roomOccupationMapper.toResponseRecord(this.save(roomOccupationMapper.fromRequestToModel(singleOccupation, hotelRoomRecord)))
+                );
+
+                beginOccupationDate = beginOccupationDate.plus(Duration.ofDays(1));
+            }
+        });
         return occupationResponseRecords;
     }
 }

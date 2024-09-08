@@ -32,7 +32,7 @@ public class RoomOccupationController {
 
     @ResponseStatus(HttpStatus.OK)
     @PostMapping("/batch/create")
-    public List<RoomOccupationResponseRecord> createRoomOccupationBatch(@RequestBody RoomOccupationRequestRecord roomOccupationRecord) {
+    public List<RoomOccupationResponseRecord> createRoomOccupationBatch(@RequestBody List<RoomOccupationRequestRecord> roomOccupationRecord) {
         return roomOccupationService.createRoomOccupationBatch(roomOccupationRecord);
     }
 
