@@ -37,7 +37,7 @@ public class HotelAppSimulation extends Simulation {
                     http("Reserve Request")
                             .post("/reserve/#{userId}")
                             .body(StringBody("#{payload}"))
-                            .check(status().in(200,201,409))
+                            .check(status().in(200, 201, 409))
             );
 
     HttpProtocolBuilder httpProtocol =
@@ -54,11 +54,7 @@ public class HotelAppSimulation extends Simulation {
     {
         setUp(
                 createRoomOccupation.injectOpen(atOnceUsers(1))
-                        .andThen(
-                                reserveScenario.injectOpen(atOnceUsers(100),
-                                        rampUsers(500).during(20),
-                                        constantUsersPerSec(50).during(60)
-                                ))
+                        .andThen(reserveScenario.injectOpen(rampUsers(500).during(20)))
         ).protocols(httpProtocol);
     }
 

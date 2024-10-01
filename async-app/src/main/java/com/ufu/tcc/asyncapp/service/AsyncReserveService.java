@@ -6,6 +6,7 @@ import com.ufu.tcc.commonsdomain.enums.Occupation;
 import com.ufu.tcc.commonsdomain.enums.PaymentStatus;
 import com.ufu.tcc.commonsdomain.enums.ReserveStatus;
 import com.ufu.tcc.commonsdomain.exception.NoRoomOccupationFoundException;
+import com.ufu.tcc.commonsdomain.exception.RoomAlreadyOccupiedException;
 import com.ufu.tcc.commonsdomain.mapper.ReserveMapper;
 import com.ufu.tcc.commonsdomain.model.RoomOccupation;
 import com.ufu.tcc.commonsdomain.records.CustomerRecord;
@@ -18,23 +19,25 @@ import com.ufu.tcc.commonsdomain.records.message.ReserveMessage;
 import com.ufu.tcc.commonsdomain.repository.ReserveRepository;
 import com.ufu.tcc.commonsdomain.service.CustomerService;
 import com.ufu.tcc.commonsdomain.service.HotelRoomService;
-import com.ufu.tcc.commonsdomain.service.ReserveService;
 import com.ufu.tcc.commonsdomain.service.RoomOccupationService;
 import com.ufu.tcc.commonsdomain.service.SESService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.aws.messaging.core.QueueMessagingTemplate;
+import org.springframework.cloud.aws.messaging.listener.SqsMessageDeletionPolicy;
 import org.springframework.cloud.aws.messaging.listener.annotation.SqsListener;
 import org.springframework.messaging.handler.annotation.Header;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.util.List;
 
 @Service
-public class AsyncReserveService implements ReserveService {
+public class AsyncReserveService {
 
     private static final Logger LOGGER = LogManager.getLogger(AsyncReserveService.class);
 
@@ -70,43 +73,25 @@ public class AsyncReserveService implements ReserveService {
         this.objectMapper = objectMapper;
     }
 
+    public Mono<Void> reserveHotelRoom(Long customerId, ReserveDataRecord reserveDataRecord, PaymentMethod paymentMethod) {
 
-    @Override
-    public void reserveHotelRoom(Long customerId, ReserveDataRecord reserveDataRecord, PaymentMethod paymentMethod) {
+        return Mono.fromCallable(() -> {
+            ReserveMessage reserveMessage = new ReserveMessage(customerId, reserveDataRecord, paymentMethod);
 
-        List<RoomOccupation> roomOccupations = roomOccupationService.findRoomOccupationByHotelRoomIdAndDates(
-                reserveDataRecord.hotelRoomId(),
-                reserveDataRecord.reserveBegin(),
-                reserveDataRecord.reserveEnd()
-        );
+            String reserveMessageJson;
+            try {
+                reserveMessageJson = objectMapper.writeValueAsString(reserveMessage);
+            } catch (Exception e) {
+                LOGGER.error("Error serializing message: {}", e.getMessage());
+                throw new RuntimeException(e);
+            }
 
-        if (roomOccupations.isEmpty()) {
-            throw new NoRoomOccupationFoundException();
-        }
-
-        roomOccupations.stream().filter(
-                roomOccupation -> Occupation.OCCUPIED.equals(roomOccupation.getOccupation())
-        ).findAny().ifPresent(
-                roomOccupation -> {
-                    throw new RuntimeException(String.format("Room is already occupied in the date %s", roomOccupation.getRoomOccupationDateBegin()));
-                }
-        );
-
-        ReserveMessage reserveMessage = new ReserveMessage(customerId,reserveDataRecord, paymentMethod);
-
-        String reserveMessageJson;
-        try {
-            reserveMessageJson = objectMapper.writeValueAsString(reserveMessage);
-        } catch (Exception e) {
-            LOGGER.error("Error serializing message: {}", e.getMessage());
-            throw new RuntimeException(e);
-        }
-
-        this.queueMessagingTemplate.send("hotel_reservation_queue", MessageBuilder.withPayload(reserveMessageJson).build());
-
+            this.queueMessagingTemplate.send("hotel_reservation_queue", MessageBuilder.withPayload(reserveMessageJson).build());
+            return null;
+        }).subscribeOn(Schedulers.boundedElastic()).then();
     }
 
-    @SqsListener("hotel_reservation_queue")
+    @SqsListener(value = "hotel_reservation_queue", deletionPolicy = SqsMessageDeletionPolicy.ON_SUCCESS)
     public void processReservation(@Header("MessageId") String messageId, @Payload String message) {
 
         LOGGER.info("Processing message with id: {} and message : {}", messageId, message);
@@ -124,6 +109,24 @@ public class AsyncReserveService implements ReserveService {
         PaymentMethod paymentMethod = reserveMessage.paymentMethod();
         Long customerId = reserveMessage.customerId();
 
+        List<RoomOccupation> roomOccupations = roomOccupationService.findRoomOccupationByHotelRoomIdAndDates(
+                reserveDataRecord.hotelRoomId(),
+                reserveDataRecord.reserveBegin(),
+                reserveDataRecord.reserveEnd()
+        );
+
+        if (roomOccupations.isEmpty()) {
+            throw new NoRoomOccupationFoundException();
+        }
+
+        roomOccupations.stream().filter(
+                roomOccupation -> Occupation.OCCUPIED.equals(roomOccupation.getOccupation())
+        ).findAny().ifPresent(
+                roomOccupation -> {
+                    throw new RoomAlreadyOccupiedException();
+                }
+        );
+
         HotelRoomRecord hotelRoomRecord = hotelRoomService.findHotelRecordRoomById(reserveDataRecord.hotelRoomId());
         CustomerRecord customerRecord = customerService.findCustomerById(customerId);
 
@@ -133,14 +136,7 @@ public class AsyncReserveService implements ReserveService {
             throw new RuntimeException("Payment failed");
         }
 
-
         this.save(customerRecord, reserveDataRecord, hotelRoomRecord);
-
-        List<RoomOccupation> roomOccupations = roomOccupationService.findRoomOccupationByHotelRoomIdAndDates(
-                reserveDataRecord.hotelRoomId(),
-                reserveDataRecord.reserveBegin(),
-                reserveDataRecord.reserveEnd()
-        );
 
         roomOccupationService.update(roomOccupations, Occupation.OCCUPIED);
 
@@ -155,7 +151,6 @@ public class AsyncReserveService implements ReserveService {
 
     }
 
-    @Override
     public List<ReserveRecord> findReserveByCustomer(String customer) {
         return null;
     }

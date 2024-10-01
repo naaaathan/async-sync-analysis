@@ -106,21 +106,6 @@ public class SyncReserveService implements ReserveService {
         );
     }
 
-    private void lockRoomsThatWillPossiblyBeOccupied(List<RoomOccupation> roomOccupations) {
-
-        // Customers may see the same date available, but only one can reserve it then we use PESSIMISTIC_READ
-        roomOccupations.forEach(
-                roomOccupation -> entityManager.lock(roomOccupation, LockModeType.PESSIMISTIC_WRITE)
-        );
-    }
-
-    private void releaseLock(List<RoomOccupation> roomOccupations) {
-
-        roomOccupations.forEach(
-                roomOccupation -> entityManager.lock(roomOccupation, LockModeType.NONE)
-        );
-    }
-
     @Override
     public List<ReserveRecord> findReserveByCustomer(String customer) {
         return null;
