@@ -87,9 +87,24 @@ CREATE TABLE IF NOT EXISTS HOTEL_TCC.reserve(
     reserve_end TIMESTAMP NOT NULL,
     hotel_room_id BIGINT NOT NULL,
     status VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     constraint pk_reserve primary key (id),
     constraint fk_reserve_hotel_room foreign key (hotel_room_id) references hotel_room(id)
 );
+
+CREATE OR REPLACE FUNCTION update_timestamp()
+    RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_timestamp
+    BEFORE INSERT OR UPDATE ON HOTEL_TCC.reserve
+    FOR EACH ROW
+EXECUTE FUNCTION update_timestamp();
 
 --SPRING SECURITY
 

@@ -41,7 +41,7 @@ public class HotelAppSimulation extends Simulation {
             );
 
     HttpProtocolBuilder httpProtocol =
-            http.baseUrl("http://localhost:8080")
+            http.baseUrl("http://localhost:8081")
                     .acceptHeader("text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8,application/json")
                     .header("Content-Type", "application/json")
                     .header("Authorization","Basic YWRtaW46cGFzc3dvcmQ=")

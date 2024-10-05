@@ -56,7 +56,7 @@ public class AwsConfiguration {
     public SimpleMessageListenerContainerFactory simpleMessageListenerContainerFactory(AmazonSQSAsync amazonSQSAsync) {
         SimpleMessageListenerContainerFactory factory = new SimpleMessageListenerContainerFactory();
         factory.setAmazonSqs(amazonSQSAsync);
-        factory.setMaxNumberOfMessages(1); // Fetch only one message at a time
+        factory.setMaxNumberOfMessages(5); // Fetch only 5 message at a time
         return factory;
     }
 }
