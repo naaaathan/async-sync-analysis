@@ -45,11 +45,16 @@ services:
       - stats
     networks:
       - mynetwork
+    deploy:
+      resources:
+        limits:
+          cpus: '4.00'
+          memory: 2048M
 
   async-app:
     build: ./async-app
     ports:
-      - "8081:8080"
+      - "8080:8080"
     depends_on:
       - db-async
       - localstack
@@ -57,6 +62,11 @@ services:
       - stats
     networks:
       - mynetwork
+    deploy:
+      resources:
+        limits:
+          cpus: '4.00'
+          memory: 2048M
 
   wiremock:
     image: "wiremock/wiremock:latest"
